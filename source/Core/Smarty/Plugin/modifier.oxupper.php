@@ -4,6 +4,9 @@
  * See LICENSE file for license details.
  */
 
+use OxidEsales\EshopCommunity\Internal\Adapter\TemplateLogic\UpperLogic;
+use OxidEsales\EshopCommunity\Internal\Application\ContainerFactory;
+
 /**
  * Smarty upper modifier
  * -------------------------------------------------------------
@@ -18,7 +21,9 @@
 
 function smarty_modifier_oxupper($sString)
 {
-    return getStr()->strtoupper($sString);
+    /** @var UpperLogic $upperLogic */
+    $upperLogic = ContainerFactory::getInstance()->getContainer()->get(UpperLogic::class);
+    return $upperLogic->formatValue($sString);
 }
 
 ?>
