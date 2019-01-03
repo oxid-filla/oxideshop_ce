@@ -1,4 +1,6 @@
 services:
+  OxidEsales\EshopCommunity\Internal\Module\Install\ModuleCopyServiceInterface:
+    class: OxidEsales\EshopCommunity\Internal\Module\Install\ModuleCopyService
   OxidEsales\EshopCommunity\Internal\Module\Install\ModuleConfigurationInstallerInterface:
     class: OxidEsales\EshopCommunity\Internal\Module\Install\ModuleConfigurationInstaller
     autowire: true
