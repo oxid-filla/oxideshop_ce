@@ -22,6 +22,11 @@ class TranslateExtension extends AbstractExtension
 
     private $translateFunctionLogic;
 
+    /**
+     * TranslateExtension constructor.
+     *
+     * @param TranslateFunctionLogic $translateFunctionLogic
+     */
     public function __construct(TranslateFunctionLogic $translateFunctionLogic)
     {
         $this->translateFunctionLogic = $translateFunctionLogic;
