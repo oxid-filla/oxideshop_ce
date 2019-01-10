@@ -6,8 +6,6 @@
 
 namespace OxidEsales\EshopCommunity\Internal\Adapter\TemplateLogic;
 
-use OxidEsales\EshopCommunity\Core\Language;
-
 /**
  * Class TranslateFunctionLogic
  *
@@ -22,47 +20,35 @@ class TranslateFunctionLogic
      *
      * @return string
      */
-    public function getTranslation(array $params) : string
+    public function getTranslation(array $params): string
     {
         startProfile("smarty_function_oxmultilang");
-
-        /**
-         * @var Language $lang
-         */
-        $lang = \OxidEsales\Eshop\Core\Registry::getLang();
+        $language = \OxidEsales\Eshop\Core\Registry::getLang();
         $config = \OxidEsales\Eshop\Core\Registry::getConfig();
-        $shop = $config->getActiveShop();
-        $admin = $lang->isAdmin();
-
+        $activeShop = $config->getActiveShop();
+        $isAdmin = $language->isAdmin();
         $ident = isset($params['ident']) ? $params['ident'] : 'IDENT MISSING';
         $args = isset($params['args']) ? $params['args'] : false;
         $suffix = isset($params['suffix']) ? $params['suffix'] : 'NO_SUFFIX';
         $showError = isset($params['noerror']) ? !$params['noerror'] : true;
-
-        $tplLanguage = $lang->getTplLanguage();
-
-        if (!$admin && $shop->isProductiveMode()) {
+        $tplLang = $language->getTplLanguage();
+        if (!$isAdmin && $activeShop->isProductiveMode()) {
             $showError = false;
         }
-
-        $translation = '';
-
         try {
-            $translation = $lang->translateString($ident, $tplLanguage, $admin);
-            $translationNotFound = !$lang->isTranslated();
+            $translation = $language->translateString($ident, $tplLang, $isAdmin);
+            $translationNotFound = !$language->isTranslated();
             if ('NO_SUFFIX' != $suffix) {
-                $suffixTranslation = $lang->translateString($suffix, $tplLanguage, $admin);
+                $suffixTranslation = $language->translateString($suffix, $tplLang, $isAdmin);
             }
-        } catch (\OxidEsales\Eshop\Core\Exception\LanguageException $exception) {
+        } catch (\OxidEsales\Eshop\Core\Exception\LanguageException $oEx) {
             // is thrown in debug mode and has to be caught here, as smarty hangs otherwise!
         }
-
-        if (isset($translationNotFound) && isset($params['alternative'])) {
+        if ($translationNotFound && isset($params['alternative'])) {
             $translation = $params['alternative'];
             $translationNotFound = false;
         }
-
-        if (!isset($translationNotFound) || !$translationNotFound) {
+        if (!$translationNotFound) {
             if ($args !== false) {
                 if (is_array($args)) {
                     $translation = vsprintf($translation, $args);
@@ -70,14 +56,12 @@ class TranslateFunctionLogic
                     $translation = sprintf($translation, $args);
                 }
             }
-
             if ('NO_SUFFIX' != $suffix) {
                 $translation .= $suffixTranslation;
             }
         } elseif ($showError) {
             $translation = 'ERROR: Translation for ' . $ident . ' not found!';
         }
-
         stopProfile("smarty_function_oxmultilang");
 
         return $translation;
