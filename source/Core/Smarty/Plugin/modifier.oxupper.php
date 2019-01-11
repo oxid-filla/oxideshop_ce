@@ -23,7 +23,7 @@ function smarty_modifier_oxupper($sString)
 {
     /** @var UpperLogic $upperLogic */
     $upperLogic = ContainerFactory::getInstance()->getContainer()->get(UpperLogic::class);
-    return $upperLogic->formatValue($sString);
+    return $upperLogic->upper($sString);
 }
 
 ?>
