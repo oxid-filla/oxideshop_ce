@@ -8,6 +8,7 @@ namespace OxidEsales\EshopCommunity\Internal\Module\Install;
 
 use Composer\Package\PackageInterface;
 use OxidEsales\ComposerPlugin\Utilities\CopyFileManager\CopyGlobFilteredFileManager;
+use OxidEsales\Facts\Facts;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -49,14 +50,16 @@ class ModuleCopyService implements ModuleCopyServiceInterface
     /** @var PackageInterface */
     private $package;
 
+    /** @var  */
+    private $context;
+
     /**
      * @param string           $eshopSourceDirectory
      * @param PackageInterface $package
      */
-    public function __construct(string $eshopSourceDirectory, PackageInterface $package)
+    public function __construct(PackageServiceInterface $packageService)
     {
-        $this->eshopSourceDirectory = $eshopSourceDirectory;
-        $this->package = $package;
+        $this->packageService = $packageService;
     }
 
     /**
