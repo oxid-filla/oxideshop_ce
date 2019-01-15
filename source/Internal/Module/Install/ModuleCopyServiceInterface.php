@@ -18,8 +18,6 @@ interface ModuleCopyServiceInterface
 
     /**
      * Copies package from vendor directory to eShop source directory
-     *
-     * @param string $packagePath
      */
-    public function copy(string $packagePath);
+    public function copy();
 }

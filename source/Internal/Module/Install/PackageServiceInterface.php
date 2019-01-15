@@ -20,4 +20,9 @@ interface PackageServiceInterface
      * @return string Path to the package
      */
     public function getPath() : string;
+
+    /**
+     * @return string
+     */
+    public function getName() : string;
 }

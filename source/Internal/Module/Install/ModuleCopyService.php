@@ -7,8 +7,7 @@
 namespace OxidEsales\EshopCommunity\Internal\Module\Install;
 
 use Composer\Package\PackageInterface;
-use OxidEsales\ComposerPlugin\Utilities\CopyFileManager\CopyGlobFilteredFileManager;
-use OxidEsales\Facts\Facts;
+use OxidEsales\EshopCommunity\Internal\Utility\FactsContextInterface;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -44,36 +43,44 @@ class ModuleCopyService implements ModuleCopyServiceInterface
 
     const EXTRA_PARAMETER_KEY_ROOT = 'oxideshop';
 
-    /** @var string $eshopSourceDirectory The root directory of OXID eShop */
-    private $eshopSourceDirectory;
-
     /** @var PackageInterface */
     private $package;
 
-    /** @var  */
+    /** @var FactsContextInterface $context */
     private $context;
 
+    /** @var CopyGlobServiceInterface $copyGlobService */
+    private $copyGlobService;
+
     /**
-     * @param string           $eshopSourceDirectory
-     * @param PackageInterface $package
+     * ModuleCopyService constructor.
+     *
+     * @param PackageServiceInterface  $packageService
+     * @param FactsContextInterface    $factsContext
+     * @param CopyGlobServiceInterface $copyGlobService
      */
-    public function __construct(PackageServiceInterface $packageService)
-    {
-        $this->packageService = $packageService;
+    public function __construct(
+        PackageServiceInterface $packageService,
+        FactsContextInterface $factsContext,
+        CopyGlobServiceInterface $copyGlobService
+    ) {
+        $this->package = $packageService->getPackage();
+        $this->context = $factsContext;
+        $this->copyGlobService = $copyGlobService;
     }
 
     /**
-     * @param string $packagePath The absolute path to the package, e.g. /var/www/vendor/oxid-esales/paypal
+     * Copies from vendor directory to source/modules directory respecting the blacklist filters given by the module.
      */
-    public function copy(string $packagePath)
+    public function copy()
     {
         $filtersToApply = [
             $this->getBlacklistFilterValue(),
             $this->getVCSFilter(),
         ];
 
-        CopyGlobFilteredFileManager::copy(
-            $this->formSourcePath($packagePath),
+        $this->copyGlobService->copy(
+            $this->formSourcePath($this->package->getPackage($path)),
             $this->formTargetPath(),
             $this->getCombinedFilters($filtersToApply)
         );
@@ -99,7 +106,7 @@ class ModuleCopyService implements ModuleCopyServiceInterface
      */
     private function getExtraParameterValueByKey($extraParameterKey, $defaultValue = null)
     {
-        $extraParameters = $this->package->getExtra();
+        $extraParameters = $this->package->getExtra($path);
 
         $extraParameterValue = isset($extraParameters[static::EXTRA_PARAMETER_KEY_ROOT][$extraParameterKey])?
             $extraParameters[static::EXTRA_PARAMETER_KEY_ROOT][$extraParameterKey]:
@@ -145,7 +152,7 @@ class ModuleCopyService implements ModuleCopyServiceInterface
             $this->package->getName()
         );
 
-        return Path::join($this->eshopSourceDirectory, static::MODULES_DIRECTORY, $targetDirectory);
+        return Path::join($this->context->getSourcePath(), static::MODULES_DIRECTORY, $targetDirectory);
     }
 
     /**
