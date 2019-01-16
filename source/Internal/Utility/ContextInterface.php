@@ -22,6 +22,11 @@ interface ContextInterface
     public function getCurrentShopId(): int;
 
     /**
+     * @return array
+     */
+    public function getAllShopIds(): array;
+
+    /**
      * @return string
      */
     public function getLogLevel();

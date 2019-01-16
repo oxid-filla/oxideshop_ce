@@ -71,6 +71,14 @@ class Context implements ContextInterface
     }
 
     /**
+     * @return array
+     */
+    public function getAllShopIds(): array
+    {
+        return $this->config->getShopIds();
+    }
+
+    /**
      * @return string
      */
     public function getShopDir(): string
